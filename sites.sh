@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
-sitefile=/opt/sitecheck/sites.txt
-sitelog=/opt/sitecheck/sites.log
+sitefile=sites.txt
+sitelog=sites.log
 curlopts="--silent \
 	--max-time 10 \
 	--location \
 	--max-redirs 10 \
 	--output /dev/null"
+log_failures_only=0
 
 function check()
 {
@@ -26,7 +27,13 @@ function check_and_report()
 	else
 		result=FAIL
 	fi
-	echo "$date $1 $result" >> $sitelog
+	if [ "$log_failures_only" -eq "1" ]; then
+		if [ "$result" == "FAIL" ]; then
+			echo "$date $1 $result" >> $sitelog
+		fi
+	else
+		echo "$date $1 $result" >> $sitelog
+	fi
 }
 
 if [ -e "$sitefile" ]; then
